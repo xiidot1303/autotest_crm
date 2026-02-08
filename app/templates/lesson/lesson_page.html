@@ -1,0 +1,86 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'lesson' }}
+{% endblock %}
+
+{% block main %}
+{% if lesson %}
+<div class="card">
+   <div class="card-header justify-content-between d-flex">
+      <div class="header-title">
+         <h5>{{ request|string:'group' }} - {{ lesson.group.title }}</h4>
+      </div>
+      <div class="header-action">
+         <a href="{% url 'lesson_end' lesson.pk %}" class="r-u-sure">
+            <button type="button" class="btn btn-outline-danger rounded-pill">{{ request|string:'end lesson' }}</button>
+         </a>
+      </div>
+   </div>
+   <div class="card-body">
+      <table class="table" >
+          <thead>
+             <tr>
+               <th>№</th>
+               <th>{{ request|string:'name' }}</th>
+               <th>{{ request|string:'phone' }}</th>
+               <th>{{ request|string:'started attend date' }}</th>
+               <th>{{ request|string:'action' }}</th>
+      
+             </tr>
+          </thead>
+          <tbody>
+              {% for j in journal %}
+             <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ j.student.name }}</td>
+                  <td>{{ j.student.phone }}</td>
+                  <td>{{ j.student|student_attended_date:lesson.group }}</td>
+                  
+                  <td class="white-space-no-wrap">
+                     {% if j.attended == None %}
+                     <a id = "a" href="{% url 'attendance_change' j.pk 1 %}" 
+                     class="btn btn-success btn-action rounded-pill">
+                     <i class="fas fa-check" aria-hidden="true"></i></a>
+
+                     <a id = "a" href="{% url 'attendance_change' j.pk 0 %}" 
+                        class="btn btn-danger btn-action rounded-pill">
+                          <i class="fas fa-times"></i>
+                      </a>        
+                      {% else %}
+                      <a id = "a" href="{% url 'attendance_change' j.pk 2 %}" 
+                       class="btn btn-primary btn-action rounded-pill">
+                         <i class="fas fa-undo"></i>
+                     </a>        
+                     {% endif %}
+                  </td>
+      
+      
+      
+      
+             </tr>
+             {% endfor %}
+          </tbody>
+      </table>
+   </div>
+</div>
+{% elif upcoming_lesson %}
+
+<div class="card">
+   <div class="card-header justify-content-between d-flex">
+      <div class="header-title">
+         <h5>{{ request|string:'group' }} - {{ upcoming_lesson.group.title }}</h4>
+      </div>
+      <div class="header-action">
+         
+         <h3>
+            {{ request|string:'start time' }}: {{ upcoming_lesson.group.start_time|date:"H:i" }}
+         </h3>
+      </div>
+   </div>
+</div>
+
+{% endif %}
+{% endblock %}

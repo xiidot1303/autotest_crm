@@ -1,0 +1,61 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'teachers' }}
+{% endblock %}
+
+{% block main %}
+<div class="card">
+   <div class="card-header">
+      <h5>{{ request|string:'teachers' }}</h4>
+   </div>
+   <div class="card-body">
+
+      <table id="datatable" class="table data-table table-striped table-bordered" >
+          <thead>
+             <tr>
+               <th>№</th>
+               <th>{{ request|string:'name' }}</th>
+               <th>{{ request|string:'specialty' }}</th>
+               <th>{{ request|string:'phone' }}</th>
+               <th>{{ request|string:'date' }}</th>
+               <th>{{ request|string:'action' }}</th>
+      
+             </tr>
+          </thead>
+          <tbody>
+              {% for s in teachers %}
+             <tr class="white-space-no-wrap">
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ s.name }}</td>
+                  <td>{{ s.specialty }}</td>
+                  <td>{{ s.phone }}</td>
+                  <td>{{ s.registred_date|date:"d.m.Y" }}</td>
+                  
+                  <td>
+                     {% if perms.app.delete_teacher %}
+                     <a id = "a" href="{% url 'teacher_delete' s.pk %}" 
+                        onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)"
+                     class="btn btn-danger btn-action rounded-pill">
+                     <i class="fas fa-trash" aria-hidden="true"></i></a>
+                     {% endif %}
+                     
+                     {% if perms.app.change_teacher %}
+                       <a id = "a" href="{% url 'teacher_update' s.pk %}" class="btn btn-primary btn-action rounded-pill">
+                          <i class="fas fa-edit"></i>
+                      </a>        
+                     {% endif %}
+                  </td>
+      
+      
+      
+      
+             </tr>
+             {% endfor %}
+          </tbody>
+      </table>
+   </div>
+</div>
+{% endblock %}

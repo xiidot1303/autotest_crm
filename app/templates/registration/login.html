@@ -1,0 +1,109 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>Вход</title>
+      
+      <!-- Favicon -->
+      
+      
+      <link rel="stylesheet" href="{% static 'assets/css/backend-plugin.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/backend.css' %}">  
+     </head>
+  <body class=" ">
+    <!-- loader Start -->
+    <div id="loading">
+          <div id="loading-center">
+          </div>
+    </div>
+    <!-- loader END -->
+    
+      <div class="wrapper">
+    <section class="login-content">
+         <div class="container h-100">
+            <div class="row align-items-center justify-content-center h-100">
+               <div class="col-md-5">
+                  <div class="card p-3">
+                     <div class="card-body">
+                        <div class="auth-logo">
+                           <!-- <img src="{% static 'assets/images/logo.png' %}" class="img-fluid  rounded-normal  darkmode-logo" alt="logo">
+                           <img src="{% static 'assets/images/logo-dark.png' %}" class="img-fluid rounded-normal light-logo" alt="logo"> -->
+                        </div>
+                        <h3 class="mb-3 font-weight-bold text-center">Авторизация</h3>
+
+                        <form method = "post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                           <div class="row">
+                              <div class="col-lg-12">
+                                 <div class="form-group">
+                                    {% if form.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                       <div class="iq-alert-text">
+                                          Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут быть чувствительны к регистру.
+                                          
+                                       </div>
+                                    </div>
+                                    {% endif %}
+                                    <label class="text-secondary">Username</label>
+                                    <input class="form-control" type="text" placeholder="Username" name="username" required id="id_username">
+                                 </div>
+                              </div>
+                              <div class="col-lg-12 mt-2">
+                                 <div class="form-group">
+                                     <div class="d-flex justify-content-between align-items-center">
+                                         <label class="text-secondary">Пароль</label>
+                                         <!-- <label><a href="auth-recover-pwd.html">Forgot Password?</a></label> -->
+                                     </div>
+                                    <input class="form-control" type="password" placeholder="Пароль" required id="id_password" name="password">
+                                 </div>
+                              </div>
+                           </div>
+                           <button type="" class="btn btn-primary btn-block mt-2">Войти</button>
+
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      </div>
+    
+    <!-- Backend Bundle JavaScript -->
+    <script src="{% static 'assets/js/backend-bundle.min.js' %}"></script>
+    <!-- Chart Custom JavaScript -->
+    <script src="{% static 'assets/js/customizer.js' %}"></script>
+    
+    <script src="{% static 'assets/js/sidebar.js' %}"></script>
+    
+    <!-- Flextree Javascript-->
+    <script src="{% static 'assets/js/flex-tree.min.js' %}"></script>
+    <script src="{% static 'assets/js/tree.js"></script>
+    
+    <!-- Table Treeview JavaScript -->
+    <script src="{% static 'assets/js/table-treeview.js' %}"></script>
+    
+    <!-- SweetAlert JavaScript -->
+    <script src="{% static 'assets/js/sweetalert.js' %}"></script>
+    
+    <!-- Vectoe Map JavaScript -->
+    <script src="{% static 'assets/js/vector-map-custom.js' %}"></script>
+    
+    <!-- Chart Custom JavaScript -->
+    <script src="{% static 'assets/js/chart-custom.js' %}"></script>
+    <script src="{% static 'assets/js/charts/01.js' %}"></script>
+    <script src="{% static 'assets/js/charts/02.js' %}"></script>
+    
+    <!-- slider JavaScript -->
+    <script src="{% static 'assets/js/slider.js' %}"></script>
+    
+    <!-- Emoji picker -->
+    <script src="{% static 'assets/vendor/emoji-picker-element/index.js' %}" type="module"></script>
+    
+    
+    <!-- app JavaScript -->
+    <script src="{% static 'assets/js/app.js' %}"></script>
+ </body>
+</html>

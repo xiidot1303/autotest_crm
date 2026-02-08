@@ -1,0 +1,68 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'users' }}
+{% endblock %}
+
+{% block main %}
+
+<div class="card">
+    <div class="card-header">
+       <h5>{{ request|string:'users' }}</h4>
+    </div>
+    <div class="card-body">
+ 
+       <table class="table" >
+           <thead>
+              <tr>
+                <th>№</th>
+                <th>{{ request|string:'username' }}</th>
+                <th>{{ request|string:'name' }}</th>
+                <th>{{ request|string:'groups' }}</th>
+                <th>{{ request|string:'email' }}</th>
+                <th>{{ request|string:'registred date' }}</th>
+                <th>{{ request|string:'last login' }}</th>
+                <th>{{ request|string:'action' }}</th>
+       
+              </tr>
+           </thead>
+           <tbody>
+               {% for u in users %}
+              <tr class="white-space-no-wrap">
+                   <td>{{ forloop.counter }}</td>
+                   <td>{{ u.username }}</td>
+                   <td>{{ u.last_name }} {{ u.first_name }}</td>
+                   <td>{{ u|groups_of_user }}</td>
+                   <td>{{ u.email }}</td>
+                   <td>{{ u.date_joined|date:'d.m.Y H:i' }}</td>
+                   <td>{{ u.last_login|date:'d.m.Y H:i' }}</td>
+                   
+                   <td>
+                      {% if perms.app.delete_student %}
+                      <a id = "a" href="{% url 'user_delete' u.pk %}" 
+                         onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)"
+                      class="btn btn-danger btn-action rounded-pill">
+                      <i class="fas fa-trash" aria-hidden="true"></i></a>
+                      {% endif %}
+                      
+                      {% if perms.app.change_student %}
+                        <a id = "a" href="{% url 'user_update' u.pk %}" class="btn btn-primary btn-action rounded-pill">
+                           <i class="fas fa-edit"></i>
+                       </a>        
+                      {% endif %}
+                   </td>
+       
+       
+       
+       
+              </tr>
+              {% endfor %}
+           </tbody>
+       </table>
+    </div>
+ </div>
+ 
+
+{% endblock %}

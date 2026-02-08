@@ -1,0 +1,70 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'groups' }}
+{% endblock %}
+
+{% block main %}
+<div class="card">
+   <div class="card-body">
+
+      <table id="datatable" class="table data-table table-striped table-bordered" >
+          <thead>
+             <tr>
+               <th>№</th>
+               <th>{{ request|string:'title' }}</th>
+               <th>{{ request|string:'teacher' }}</th>
+               <th>{{ request|string:'course' }}</th>
+               <th>{{ request|string:'days' }}</th>
+               <th>{{ request|string:'time' }}</th>
+               <th>{{ request|string:'action' }}</th>
+             </tr>
+          </thead>
+          <tbody>
+              {% for g in groups %}
+
+             <tr class="clickable white-space-no-wrap" data-href="{% url 'group_page' g.pk %}">
+                  <td>{{ forloop.counter }}</td>
+                  
+                  <td>{{ g.title }}</td>
+
+                  <td>
+                     <a target="_blank" href="{% url 'teacher_update' g.teacher.pk %}">{{ g.teacher.name }}</a>
+                  </td>
+                  <td>
+                     <a target="_blank" href="{% url 'course_update' g.course.pk %}">{{ g.course.title }}</a>
+                  </td>
+                  <td>
+                     {{ request|weekdays_as_string:g }}
+                  </td>
+                  <td>{{ g.start_time|time }} - {{ g.end_time|time }}</td>
+
+                  
+                  <td>
+                     {% if perms.app.delete_group %}
+                     <a id = "a" href="{% url 'group_delete' g.pk %}" 
+                        onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)"
+                     class="btn btn-danger rounded-pill btn-action">
+                     <i class="fas fa-trash" aria-hidden="true"></i></a>
+                     {% endif %}
+                     
+                     {% if perms.app.change_group %}
+                       <a id = "a" href="{% url 'group_update' g.pk %}" class="btn btn-primary rounded-pill btn-action">
+                          <i class="fas fa-edit"></i>
+                      </a>        
+                     {% endif %}
+                  </td>
+                  
+                  
+                  
+                  
+               </tr>
+         
+             {% endfor %}
+          </tbody>
+      </table>
+   </div>
+</div>
+{% endblock %}

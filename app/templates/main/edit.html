@@ -1,0 +1,77 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:title }}
+{% if title1 %}
+| {{ request|string:title1 }}
+{% endif %}
+{% endblock %}
+
+{% block main %}
+<div class="card">
+    <div class="card-header">
+        <h4>{{ request|string:header1 }} - {{ header2 }}</h4>
+    </div>
+    <div class="card-body">
+        <form method = "post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+            {% for f in form %}
+        
+                {% if forloop.counter0|is_even_number %}
+                </div>
+                <div class="row">
+                {% else %}
+                {% endif %}
+                <div class="col-lg">
+                    {% if f.id_for_label == 'id_photo' %}
+                    <div class="custom-file mb-3">
+                        {{ f.errors }} 
+                        <!-- <p>Custom file:</p> -->
+                        <label class="custom-file-label" for="id_photo">Фото</label>
+                        {{ f }}
+                    </div>
+                    {% elif 'id_phone' in f.id_for_label %}
+                    <label for="{{f.id_for_label}}">{{ request|string:f.label }}</label>    
+                    <div class="input-group">
+                        {{ f.errors }} 
+                        {{ f }}
+                    </div>
+                    {% elif not f.id_for_label %}
+                    </div>
+                    <div class="row">
+                        <div class="checkbox d-inline-block">
+                            <label for="{{f.id_for_label}}">{{ request|string:f.label }}:</label> 
+
+                        {{ f.errors }} 
+                        {% for i in f %}
+                        {{ request|label_string:i }}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="form-group">
+                            {{ f.errors }} 
+                            <label for="{{f.id_for_label}}">{{ request|string:f.label }}</label>    
+                            {{ f }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+            {% endfor %}
+            {% if not form|length_form|is_even_number %}
+            <div class="col-lg"></div>
+            {% endif %}
+            </div>
+            <div style="text-align: center;">
+                <button type="submit" class="btn btn-primary mt-3">{{ request|string:'save' }}</button>
+            </div>
+        
+        </form>
+
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'lesson' }}
+{% endblock %}
+
+{% block main %}
+
+<div class="card">
+   <div class="card-header justify-content-between d-flex">
+      <div class="header-title">
+         <h4>{{ request|string:'lessons' }}</h4>
+      </div>
+      <div class="header-action d-flex justify-content-between">
+         <div>
+            {% if perms.app.add_student_to_group %}
+            <a href="" data-toggle="modal" data-target="#add_groupModal">
+               <button class="btn btn-outline-success rounded-pill btn-action"
+                   title="{{ request|string:'add student' }}" data-toggle="tooltip">
+                   <i class="fas fa-plus"></i>
+               </button>
+   
+            </a>
+            {% endif %}
+            <div class="tooltip bs-tooltip-top" role="tooltip">
+                <div class="arrow"></div>
+                <div class="tooltip-inner">{{ request|string:'edit' }}</div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="card-body">
+      <table class="table" >
+          <thead>
+             <tr>
+               <th>{{ request|string:'name' }}</th>
+               <th>{{ request|string:'lesson1' }}</th>
+               <th>{{ request|string:'lesson2' }}</th>
+               <th>{{ request|string:'lesson3' }}</th>
+               <th>{{ request|string:'lesson4' }}</th>
+               <th>{{ request|string:'lesson5' }}</th>
+               <th>{{ request|string:'lesson6' }}</th>
+               <th>{{ request|string:'lesson7' }}</th>
+               <th>{{ request|string:'action' }}</th>
+             </tr>
+          </thead>
+          <tbody>
+            {% for group in groups %}
+             <tr>
+                <td>
+                  <a href="{% url 'student_page' group.member.student.pk %}">
+                     {{ group.member.student.name }}
+                  </a>
+               </td>
+                {% for lesson in group.lessons.all %}
+                <td>
+                {% if not lesson.start_datetime %}
+                <a href="{% url 'lesson_start' lesson.pk %}" class="btn btn-primary">
+                  {{ request|string:'start' }}
+                </a>
+                {% elif not lesson.end_datetime %}
+                <a href="{% url 'lesson_end' lesson.pk %}" class="btn btn-primary">
+                  {{ request|string:'end' }}
+                </a>
+                {% else %}
+                {{ lesson.start_datetime|date:"H:i" }} - {{ lesson.end_datetime|date:"H:i" }}
+                {% endif %}
+                </td>
+                {% endfor %}
+                <td>
+                  {% if perms.app.view_payment %}
+                    <a href="{% url 'payment_list_by_student' group.member.student.pk %}" target="_blank">
+                        <button class="btn btn-action btn-outline-info rounded-pill ml-2" data-toggle="tooltip" data-placement="bottom" 
+                            title="{{ request|string:'payments' }}">
+                            <i class="fas fa-file-invoice"></i>
+                        </button>
+                    </a>
+                    {% endif %}
+                </td>
+      
+      
+             </tr>
+             {% endfor %}
+          </tbody>
+      </table>
+   </div>
+</div>
+
+
+<!-- MODALS -->
+
+<!-- new group modal -->
+<div class="modal fade" id="add_groupModal" tabindex="-1" role="dialog" aria-labelledby="add_groupModal" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                           <div class="modal-content">
+                              <div class="modal-header">
+                                 <h5 class="modal-title" id="add_groupModalLabel">{{ request|string:'create lesson' }}</h5>
+                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                 <span aria-hidden="true">&times;</span>
+                                 </button>
+                              </div>
+                              <!-- selection student -->
+                              <form method = "post" action="{% url 'group_set_student_to_new_group' %}" enctype="multipart/form-data">
+                              <div class="modal-body">
+                                    {% csrf_token %}
+                                    {% for f in student_form %}
+                                    <div class="row">
+                                        <div class="col">
+                                            {{ f.errors }} 
+                                            <label for="{{f.id_for_label}}">{{ request|string:f.label }}</label>    
+                                            {% if 'id_discount' in f.id_for_label %}
+                                            <div class="input-group">
+                                                {{ f }}
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text" id="percent-icon"><i class="fas fa-percent"></i></span>
+                                                 </div>
+                                            </div>
+                                            {% else %}
+                                            {{ f }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <br>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ request|string:'close' }}</button>
+                                    <button type="submit" class="btn btn-primary">{{ request|string:'add' }}</button>
+                                </div>
+                            </form>
+                           </div>
+                        </div>
+                    </div>
+
+{% endblock %}

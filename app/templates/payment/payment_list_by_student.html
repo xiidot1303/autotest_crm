@@ -1,0 +1,205 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'payments' }} - {{ student.name }} 
+{% endblock %}
+
+{% block main %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="header-title">
+            <h4>
+                {{ request|string:'payments' }} - {{ student.name }}
+            </h4>
+            {% if group %}
+            <h5>
+                {{ request|string:'group' }}:
+                <u>
+                    <a href="{% url 'group_page' group.pk %}">{{ group.title }}</a>
+                </u>
+            </h5>     
+            {% endif %}
+        </div>
+        
+    </div>
+    <div class="card-body">
+        <table id="datatable" class="table data-table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>{{ request|string:'status' }}</th>
+                    <th>{{ request|string:'group' }}</th>
+                    <th>{{ request|string:'due_date' }}</th>
+                    <th>{{ request|string:'amount' }}</th>
+                    <th>{{ request|string:'action' }}</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td class="w-10">
+                        <button type="button" class="btn"
+                            data-container="body" data-toggle="popover" data-placement="top" 
+                                data-content="{{ request|string:'payed' }}: {{ p|payed_amount }}: {{ request|string:'remaining' }}: {{ p|remaining_amount }}">
+
+                            <div class="progress payment-progress">
+                                <div class="progress-bar bg-{{ p|status_by_percent }}" role="progressbar" style="width: {{ p|payed_percent }}%"
+                                 aria-valuenow="{{ p|payed_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                             </div>
+                        </button>
+        
+                    </td>
+                    <td>{{ p|group_title_by_payment }}</td>
+                    <td>{{ p.due_date|date:"d.m.Y" }}</td>
+                    <td>{{ p.amount }}</td>
+                    <td class="">
+                        {% if not p.payed %}
+                        {% if perms.app.add_income %}
+                        <a type="button" data-toggle="modal" data-target="#payModal{{ p.pk }}">
+                            <button class="btn btn-action btn-primary" data-toggle="tooltip" data-placement="top"
+                             title="{{ request|string:'pay' }}">
+                             <i class="fas fa-money-check-alt"></i>
+                            </button>
+                        </a>
+                        {% endif %}
+                        {% endif %}
+                        
+                        <!-- start pay modal -->
+                        <div class="modal fade" id="payModal{{ p.pk }}" tabindex="-2" role="dialog" aria-labelledby="payModalLabel{{ p.pk }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                   <div class="modal-content">
+                                       <div class="modal-header">
+                                           <h5 class="modal-title" id="payModalLabel{{ p.pk }}">{{ request|string:'pay for group' }}</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                               <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <form method = "post" enctype="multipart/form-data" action="{% url 'payment_pay' %}">
+                                            {% csrf_token %}
+                                            <div class="modal-body">
+                                            <p>{{ request|string:'group' }}: {{ p|group_title_by_payment }}</p>
+                                            <p>{{ request|string:'student' }}: {{ student.name }}</p>
+                                            <p>{{ request|string:'remaining amount' }}: {{ p|remaining_amount }}</p>
+                                            <p>{{ request|string:'due date' }}: {{ p.due_date|date:"d.m.Y" }}</p>
+                                            <hr>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="id_amount{{ p.pk }}">
+                                                    {{ request|string:'amount' }}:
+                                                </label>
+                                                <input id="id_amount{{ p.pk }}" type="number" class="form-control"
+                                                    name="amount" value="{{ p|remaining_amount }}" 
+                                                    max="{{ p|remaining_amount }}" min="1000">
+                                                <br>
+                                                <select name="type" id="id_type{{ p.pk }}" class="form-control choicesjs">
+                                                    <option value="cash" selected>{{ request|string:'cash' }}</option>
+                                                    <option value="card">{{ request|string:'card' }}</option>
+                                                </select>
+                                                <input id="id_payment{{ p.pk }}" type="text"
+                                                name="payment" value="{{ p.pk }}" hidden>
+                                                
+                                                <input id="id_student{{ p.pk }}" type="text"
+                                                    name="student" value="{{ student.pk }}" hidden>
+                                                <input id="id_group{{ p.pk }}" type="text"
+                                                    name="group" value="{{ group_pk }}" hidden>
+                                            </div>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ request|string:'close' }}</button>
+                                         <button type="submit" class="btn btn-primary">{{ request|string:'pay' }}</button>
+                                      </div>
+                                    </form>
+                                   </div>
+                                </div>
+                             </div>
+                             <!-- end pay modal -->
+                             
+                             
+                             <a type="button" data-toggle="modal" data-target="#payment_historyModal{{ p.pk }}">
+                                 <button class="btn btn-action" style="background-color: rgb(224, 173, 20); color: white;"
+                                     data-toggle="tooltip" data-placement="top" title="{{ request|string:'payment history' }}">
+                                     <i class="fas fa-eye"></i>
+                                 </button>
+                             </a>
+
+                            <!-- start payment history Modal -->
+                            
+                            <div class="modal fade" id="payment_historyModal{{ p.pk }}" tabindex="-1" role="dialog" aria-labelledby="payment_historyModal{{ p.pk }}Label" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+                                   <div class="modal-content">
+                                      <div class="modal-header">
+                                         <h5 class="modal-title" id="payment_historyModal{{ p.pk }}Label">
+                                            {{ request|string:'payment history' }}
+                                         </h5>
+                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                         <span aria-hidden="true">&times;</span>
+                                         </button>
+                                      </div>
+                                    <div class="modal-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>№</th>
+                                                    <th>{{ request|string:'amount' }}</th>
+                                                    <th>{{ request|string:'type' }}</th>
+                                                    <th>{{ request|string:'date' }}</th>
+                                                    <th>{{ request|string:'action' }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for i in p|filter_incomes %}
+                                                <tr class="white-space-no-wrap">
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <!-- income or expense -->
+                                                    {% if i.amount > 0 %}
+                                                    <td style="color: green;">
+                                                        +{{ i.amount }}
+                                                    {% else %}
+                                                    <td style="color: red;">
+                                                        {{ i.amount }}
+                                                    {% endif %}
+                                                    </td>
+                                                    <!--  -->
+                                                    <td>{{ request|string:i.type }}</td>
+                                                    <td>{{ i.datetime|date:"H:i d.m.Y" }}</td>
+                                                    <td>
+
+                                                        {% if perms.app.delete_income and i.amount > 0 and not i.cancelled and not i.conf %}
+                                                        <a href="{% url 'payment_cancel' i.pk %}" 
+                                                            class="btn btn-danger btn-action" 
+                                                            onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)">
+                                                            <i class="fas fa-times"></i>
+                                                        </a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    
+                                    </div>
+                                    <div class="modal-footer">
+                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                            {{ request|string:'close' }}
+                                        </button>
+                                    </div>
+                                   </div>
+                                </div>
+                             </div>
+                            
+                            <!-- end payment history Modal -->
+                             
+
+                            </td>
+                        </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

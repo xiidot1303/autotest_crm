@@ -1,0 +1,296 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'groups' }}
+{% endblock %}
+
+{% block main %}
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <!-- start card header -->
+            <div class="card-header d-flex justify-content-between">
+                <h4 class="card-title">{{ group.course.title }} ・ {{ group.title }}</h4>
+                
+                <!-- start header-action -->
+                <div class="header-action d-flex justify-content-between">
+                    <div>
+                        {% if perms.app.change_group %}
+                        <a href="{% url 'group_update' group.pk %}" class="btn btn-outline-primary rounded-pill btn-action"  
+                        title="{{ request|string:'edit' }}" data-toggle="tooltip">
+                        <i class="fas fa-edit"></i>
+                        </a>
+                        {% endif %}
+                        <div class="tooltip bs-tooltip-top" role="tooltip">
+                            <div class="arrow"></div>
+                            <div class="tooltip-inner">{{ request|string:'edit' }}</div>
+                        </div>
+                    </div>
+                    <div>
+                        {% if perms.app.change_group and perms.app.add_payment %}
+                        <a href="" data-toggle="modal" data-target="#add_studentModal">
+                            <button class="btn btn-outline-success rounded-pill btn-action"
+                                title="{{ request|string:'add student' }}" data-toggle="tooltip">
+                                <i class="fas fa-plus"></i>
+                            </button>
+    
+                        </a>
+                        {% endif %}
+    
+                        <div class="tooltip bs-tooltip-top" role="tooltip">
+                            <div class="arrow"></div>
+                            <div class="tooltip-inner">{{ request|string:'add student' }}</div>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="add_studentModal" tabindex="-1" role="dialog" aria-labelledby="add_studentModal" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                           <div class="modal-content">
+                              <div class="modal-header">
+                                 <h5 class="modal-title" id="add_studentModalLabel">{{ request|string:'adding student' }}</h5>
+                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                 <span aria-hidden="true">&times;</span>
+                                 </button>
+                              </div>
+                              <!-- selection student -->
+                              <form method = "post" enctype="multipart/form-data">
+                              <div class="modal-body">
+                                    {% csrf_token %}
+                                    {% for f in form %}
+                                    <div class="row">
+                                        <div class="col">
+                                            {{ f.errors }} 
+                                            <label for="{{f.id_for_label}}">{{ request|string:f.label }}</label>    
+                                            {% if 'id_discount' in f.id_for_label %}
+                                            <div class="input-group">
+                                                {{ f }}
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text" id="percent-icon"><i class="fas fa-percent"></i></span>
+                                                 </div>
+                                            </div>
+                                            {% else %}
+                                            {{ f }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <br>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ request|string:'close' }}</button>
+                                    <button type="submit" class="btn btn-primary">{{ request|string:'add' }}</button>
+                                </div>
+                            </form>
+                           </div>
+                        </div>
+                    </div>
+ 
+                </div>
+                <!-- start header-action -->
+
+            </div>
+            <!-- end card header -->
+
+
+            <div class="card-body">
+
+                <!-- start body info -->
+                <p class="card-text">
+                    <b>{{ request|string:'teacher' }}:</b> {{ group.teacher }}
+                </p>
+                
+                <p class="card-text">
+                    <b>{{ request|string:'weekdays' }}:</b> {{ request|weekdays_as_string:group }} <br>
+                    <b>{{ request|string:'time' }}:</b> {{ group.start_time|time }} - {{ group.end_time|time }}
+                    
+                </p>
+                <p class="card-text">
+                    <b>{{ request|string:'price' }}:</b> {{ group.course.price }}
+                </p>
+                
+                <p class="card-text">
+                    <b>{{ request|string:'started date' }}:</b> {{ group.start_date|date:"d.m.Y" }}
+                </p>
+                
+                <p class="card-text">
+                    <b>{{ request|string:'remaining lessons' }}:</b> {{ group.remaining_lessons }}
+                </p>
+                
+                <!-- end body info -->
+                <hr>
+                <table class="table table-borderless">
+                    <tbody>
+                        {% for member in group|ordered_members_list_of_group:request %}
+
+                            {% if member.status == 0 %} 
+                            <tr style="color: rgba(128, 128, 128, 0.771)">
+                            {% else %}
+                            <tr>
+                            {% endif %}
+                                <td class="w-10">
+                                    
+                                    {{ forloop.counter }}.</td>
+                            
+                                <td>{{ member.student.name }}</td>
+
+                                <!-- <td>{{ member.student.phone }}</td> -->
+                                <td class="w-10">
+                                    {% if perms.app.add_income %}
+                                    <a type="button" data-toggle="modal" data-target="#payModal{{ member.pk }}">
+                                        {% if member|payable_remaining_amount == 0 %}
+                                        <!-- empty -->
+                                        {% elif member.payable_amount == 0 %}
+                                        <i class="fas fa-money-check-alt" style="color: green"></i> 
+                                        {% else %}
+                                        <i class="fas fa-money-check-alt" style="color: red"></i>
+                                        {% endif %} 
+                                    </a>
+                                    {% endif %}
+                                    <!-- start pay modal -->
+                                    <div class="modal fade" id="payModal{{ member.pk }}" tabindex="-2" role="dialog" aria-labelledby="payModalLabel{{ member.pk }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                               <div class="modal-content">
+                                                   <div class="modal-header">
+                                                       <h5 class="modal-title" id="payModalLabel{{ member.pk }}">{{ request|string:'pay for group' }}</h5>
+                                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                           <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form method = "post" enctype="multipart/form-data" action="{% url 'group_pay' %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                        <p>{{ request|string:'group' }}: {{ group.title }}</p>
+                                                        <p>{{ request|string:'student' }}: {{ member.student.name }}</p>
+                                                        <p>{{ request|string:'remaining amount' }}: {{ member|payable_remaining_amount }}</p>
+                                                        <p>{{ request|string:'due date' }}: {{ member|payable_due_date }}</p>
+                                                        <hr>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <label for="id_amount{{ member.pk }}">
+                                                                {{ request|string:'amount' }}:
+                                                            </label>
+                                                            <input id="id_amount{{ member.pk }}" type="number" class="form-control"
+                                                                name="amount" value="{{ member|payable_remaining_amount }}" 
+                                                                max="{{ member|payable_remaining_amount }}" min="1000">
+                                                            <br>
+                                                            <select name="type" id="id_type{{ member.pk }}" class="form-control choicesjs">
+                                                                <option value="cash" selected>{{ request|string:'cash' }}</option>
+                                                                <option value="card">{{ request|string:'card' }}</option>
+                                                            </select>
+
+                                                            <input id="id_member{{ member.pk }}" type="text"
+                                                                name="member" value="{{ member.pk }}" hidden>
+                                                            
+                                                            <input id="id_group{{ member.pk }}" type="text"
+                                                                name="group" value="{{ group.pk }}" hidden>
+                                                        </div>
+                                                    </div>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ request|string:'close' }}</button>
+                                                     <button type="submit" class="btn btn-primary">{{ request|string:'pay' }}</button>
+                                                  </div>
+                                                </form>
+                                               </div>
+                                            </div>
+                                         </div>
+                                    <!-- end pay modal -->
+
+                                </td>
+                                <td>
+                                    
+
+
+                                    <a href="" class="" data-toggle="dropdown" style="color: rgba(0, 0, 0, 0.742);">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        {% if perms.app.change_group and perms.app.delete_payment %}
+                                        <a href="{% url 'group_remove_student' group.pk member.pk %}" class="dropdown-item r-u-sure">
+                                            <i class="fas fa-trash"></i> {{ request|string:'remove from group' }}
+                                        </a>
+                                        {% endif %}
+
+                                        {% if perms.app.view_payment %}
+                                        <a href="{% url 'payment_list_by_student' member.student.pk group.pk %}" class="dropdown-item">
+                                            <i class="fas fa-file-invoice"></i> {{ request|string:'payments' }}
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- start monthly attendance -->
+    <div class="col-lg-8">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            {% for date in dates %}
+            <li class="nav-item" data-toggle="tooltip" data-placement="top" title="{{ date|index:1 }} - {{ request|string:'year' }}">
+                <a class="nav-link {% if dates|is_current_date:date %}active{% endif %}" 
+                id="pills-{{ date|for_pills }}-tab" data-toggle="pill" href="#pills-{{ date|for_pills }}" role="tab" 
+                    aria-controls="pills-{{ date|for_pills }}" aria-selected="{% if dates|is_current_date:date %}true{% else %}false{% endif %}">
+                    {{ request|get_month_by_date:date }}
+                </a>
+                </li>
+            {% endfor %}
+
+         </ul>
+         <div class="card">
+            <!-- <div class="card-header">
+                <h5 class="card-header">{{ request|string:'attendance' }}</h4>
+            </div> -->
+            <div class="card-body tab-content" id="pills-tabContent-2">
+            {% for date in dates %}
+                <div class="table-responsive tab-pane fade {% if dates|is_current_date:date %}active show{% endif %}" 
+                    id="pills-{{ date|for_pills }}" role="tabpanel" aria-labelledby="pills-{{ date|for_pills }}-tab">
+                    <table class="table scrolling-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ request|string:'student' }}</th>
+                                {% for lesson in group|lessons_current_date:date %}
+                                <th scope="col" class="clickable" data-href="">
+                                    {{ lesson.start_datetime.day }}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in group|ordered_members_list_of_group:request %}
+                            <tr>
+                                <td scope="col">{{ member.student.name }}</td>
+                                {% for lesson in group|lessons_current_date:date %}
+                                <td>
+                                    {% if lesson|is_student_attended_to_lesson:member.student %}
+                                    <i class="fas fa-check-circle" style="color: green;"></i>
+                                    {% elif lesson|is_student_attended_to_lesson:member.student == False %}
+                                    <i class="fas fa-times-circle" style="color: rgb(207, 0, 0);"></i>
+                                    {% elif lesson|is_student_attended_to_lesson:member.student == None %}
+                                    <i class="far fa-circle"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- start monthly attendance -->
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'courses' }}
+{% endblock %}
+
+{% block main %}
+<div class="card">
+   <div class="card-body">
+
+      <table id="datatable" class="table data-table table-striped table-bordered" >
+          <thead>
+             <tr>
+               <th>№</th>
+               <th>{{ request|string:'title' }}</th>
+               <th>{{ request|string:'description' }}</th>
+               <th>{{ request|string:'lessons count' }}</th>
+               <th>{{ request|string:'action' }}</th>
+             </tr>
+          </thead>
+          <tbody>
+              {% for c in courses %}
+             <tr class="white-space-no-wrap">
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ c.title }}</td>
+                  <td>{{ c.description }}</td>
+                  <td>{{ c.lessons }}</td>
+
+                  
+                  <td>
+                     {% if perms.app.delete_course %}
+                     <a id = "a" href="{% url 'course_delete' c.pk %}" 
+                        onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)"
+                     class="btn btn-danger rounded-pill btn-action">
+                     <i class="fas fa-trash" aria-hidden="true"></i></a>
+                     {% endif %}
+                     
+                     {% if perms.app.change_course %}
+                       <a id = "a" href="{% url 'course_update' c.pk %}" class="btn btn-primary rounded-pill btn-action">
+                          <i class="fas fa-edit"></i>
+                      </a>        
+                     {% endif %}
+                  </td>
+      
+      
+      
+      
+             </tr>
+             {% endfor %}
+          </tbody>
+      </table>
+   </div>
+</div>
+{% endblock %}

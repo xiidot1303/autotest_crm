@@ -1,0 +1,77 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'debtors' }}
+{% endblock %}
+
+{% block main %}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between row">
+        <h4 class="card-title col-lg">
+            {{ request|string:'debtors' }} 
+        </h4>
+        <div class="card-action col-lg">
+            <form action="" method="get">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="id_group" class="mt-2">{{ request|string:'group' }}:</label>
+                    </div>
+                    <div class="col-lg-6">
+                        <select class="form-control" name="group" id="id_group">
+                            <option value="" {% if not group_pk %} selected {% endif %}>------</option>
+                            {% for group in groups %}
+                            <option value={{ group.pk }} {% if group_pk == group.pk %} selected {% endif %}>{{ group.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <button type="submit" class="btn btn-action btn-outline-primary">
+                            {{ request|string:'filter' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="datatable" class="table data-table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>{{ request|string:'student' }}</th>
+                    <th>{{ request|string:'group' }}</th>
+                    <th>{{ request|string:'due_date' }}</th>
+                    <th>{{ request|string:'amount' }}</th>
+                    <th>{{ request|string:'status' }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td class="w-10">{{ forloop.counter }}</td>
+                    <td>{{ payment.member.student.name }}</td>
+                    <td>{{ payment.member.group.title }}</td>
+                    <td>{{ payment.due_date|date:"d.m.Y" }}</td>
+                    <td>{{ payment.remaining_amount|number }}</td>
+                    <td class="w-10">
+                        <button type="button" class="btn"
+                        data-container="body" data-toggle="popover" data-placement="top" 
+                            data-content="{{ request|string:'payed' }}: {{ payment|payed_amount }}: {{ request|string:'remaining' }}: {{ payment|remaining_amount }}">
+
+                        <div class="progress payment-progress">
+                            <div class="progress-bar bg-{{ payment|status_by_percent }}" role="progressbar" style="width: {{ payment|payed_percent }}%"
+                             aria-valuenow="{{ payment|payed_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                         </div>
+                    </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

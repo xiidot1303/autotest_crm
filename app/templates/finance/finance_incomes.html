@@ -1,0 +1,63 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'incomes' }}
+{% endblock %}
+
+{% block main %}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between row">
+        <h4 class="card-title col-lg">
+            {{ request|string:'overall' }}: {{ overall_amount|number }}
+        </h4>
+        <div class="card-action d-flex justify-content-between col-lg">
+            <form action="" method="get">
+                <input type="hidden" name="filter">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <input name="from" id="from_date" type="date" class="form-control" value="{{ from }}">
+                    </div>
+                    <div class="col-lg-5">
+                        <input name="to" id="to_date" type="date" class="form-control" value="{{ to }}">
+                    </div>
+                    <div class="col-lg-2">
+                        <button type="submit" class="btn btn-action btn-outline-primary">
+                            {{ request|string:'filter' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="datatable" class="table data-table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>{{ request|string:'student' }}</th>
+                    <th>{{ request|string:'group' }}</th>
+                    <th>{{ request|string:'amount' }}</th>
+                    <th>{{ request|string:'payment type' }}</th>
+                    <th>{{ request|string:'date' }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ income.student.name }}</td>
+                    <td>{{ income.group.title }}</td>
+                    <td>{{ income.amount|number }}</td>
+                    <td>{{ request|string:income.type }}</td>
+                    <td>{{ income.datetime|date:"d.m.Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

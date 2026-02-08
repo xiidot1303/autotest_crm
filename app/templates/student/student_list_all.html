@@ -1,0 +1,63 @@
+{% extends 'layout/basic.html' %}
+
+{% load static %}
+
+{% block title %}
+{{ request|string:'students' }}
+{% endblock %}
+
+{% block main %}
+<div class="card">
+   <div class="card-header">
+      <h5>{{ request|string:'students' }}</h4>
+   </div>
+   <div class="card-body">
+
+      <table id="datatable" class="table data-table table-striped table-bordered" >
+          <thead>
+             <tr>
+               <th>№</th>
+               <th>{{ request|string:'name' }}</th>
+               <th>{{ request|string:'address' }}</th>
+               <th>{{ request|string:'age' }}</th>
+               <th>{{ request|string:'phone' }}</th>
+               <th>{{ request|string:'date' }}</th>
+               <th scope="col">{{ request|string:'action' }}</th>
+      
+             </tr>
+          </thead>
+          <tbody>
+              {% for s in students %}
+             <tr class="clickable white-space-no-wrap" data-href="{% url 'student_page' s.pk %}">
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ s.name }}</td>
+                  <td>{{ s.address }}</td>
+                  <td>{{ s.age }}</td>
+                  <td>{{ s.phone }}</td>
+                  <td>{{ s.registred_date|date:"d.m.Y" }}</td>
+                  
+                  <td style="width: 100px;">
+                     {% if perms.app.delete_student %}
+                     <a id = "a" href="{% url 'student_delete' s.pk %}" 
+                        onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)"
+                     class="btn btn-danger btn-action rounded-pill">
+                     <i class="fas fa-trash" aria-hidden="true"></i></a>
+                     {% endif %}
+                     
+                     {% if perms.app.change_student %}
+                       <a id = "a" href="{% url 'student_update' s.pk %}" class="btn btn-primary btn-action rounded-pill">
+                          <i class="fas fa-edit"></i>
+                      </a>        
+                     {% endif %}
+                  </td>
+      
+      
+      
+      
+             </tr>
+             {% endfor %}
+          </tbody>
+      </table>
+   </div>
+</div>
+{% endblock %}

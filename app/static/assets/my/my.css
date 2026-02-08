@@ -1,0 +1,61 @@
+
+
+.grey {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(7, 15, 25, 0.75);
+
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+}
+
+.i {
+    color: brown;
+}
+
+#id_phone_0 {
+    size: 10px;
+}
+
+#alert-box {
+    position: fixed;
+    top: 70px;
+    /* left: 100px; */
+    z-index: 99;
+    opacity: 4;
+    transition: 4s;
+    /* width: 100px; */
+    /* width: 100%; */
+    min-width: 100px;
+    right: 20px;
+    /* display: none; */
+}
+
+.btn-action {
+    padding: .425rem 1rem;
+}
+
+.description {
+    width: 200px;
+    height: 100px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.inactive-student {
+    color: gray;
+}
+
+.scrolling-table th:first-child, .scrolling-table td:first-child{
+    position: sticky;
+    left: 0;
+    background-color: #ffffff;
+}
+
+.payment-progress {
+    width: 100px;
+}
