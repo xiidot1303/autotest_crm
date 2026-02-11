@@ -168,7 +168,7 @@
                                                     <td>{{ i.datetime|date:"H:i d.m.Y" }}</td>
                                                     <td>
 
-                                                        {% if perms.app.delete_income and i.amount > 0 and not i.cancelled and not i.conf %}
+                                                        {% if perms.app.delete_income and i.amount > 0 and not i.cancelled %}
                                                         <a href="{% url 'payment_cancel' i.pk %}" 
                                                             class="btn btn-danger btn-action" 
                                                             onclick="return confirm(&#39;{{ request|string:'are you sure' }}&#39;)">
