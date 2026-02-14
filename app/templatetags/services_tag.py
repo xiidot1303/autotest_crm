@@ -79,3 +79,15 @@ def user_lang(request):
 def student_by_request(request):
     user = request
     return student_service.get_student_by_user(user)
+
+@register.filter()
+def group_last_lesson(group):
+    return lesson_service.get_last_lesson_of_group(group)
+
+@register.filter()
+def group_next_lesson(group):
+    return lesson_service.get_next_lesson_of_group(group)
+
+@register.filter()
+def lesson_index(group):
+    return lesson_service.get_lesson_index(group)

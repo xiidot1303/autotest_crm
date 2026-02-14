@@ -76,6 +76,19 @@ def filter_lessons_monthly(group, month, year):
         )
     return query
 
+def get_last_lesson_of_group(group):
+    now = datetime_now()
+    query = Lesson.objects.filter(group=group).exclude(end_datetime=None).order_by('-end_datetime').first()
+    return query
+
+
+def get_next_lesson_of_group(group):
+    query = Lesson.objects.filter(group=group, end_datetime=None).first()
+    return query
+
+def get_lesson_index(group: Group):
+    return group.course.lessons - group.remaining_lessons + 1
+
 # JOURNAL
 
 def get_journal_by_id(id):

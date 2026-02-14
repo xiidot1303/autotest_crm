@@ -17,6 +17,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
 application = Cling(get_wsgi_application())
 
-if DEBUG:
-    from app.bot.update import updater
-    updater.start_polling()
+# if DEBUG:
+#     from app.bot.update import updater
+#     updater.start_polling()

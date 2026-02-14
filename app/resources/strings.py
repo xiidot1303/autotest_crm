@@ -288,15 +288,15 @@ lang_dict = {
 
     "create lesson": ["Dars yaratish", "Создать урок"],
 
-    "": ["", ""],
+    "previous lesson": ["Oldingi dars", "Предыдущий урок"],
 
-    "": ["", ""],
+    "current lesson": ["Joriy dars", "Текущий урок"],
 
-    "": ["", ""],
+    "next lesson": ["Keyingi dars", "Следующий урок"],
 
-    "": ["", ""],
+    "last lesson": ["Oxirgi dars", "Последний урок"],
 
-    "": ["", ""],
+    "lesson no": ["Dars №", "Урок №"],
 
     "": ["", ""],
 
