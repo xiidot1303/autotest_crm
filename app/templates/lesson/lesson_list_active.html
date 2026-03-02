@@ -63,11 +63,11 @@
                </td>
                <td>
                   {% with group|group_next_lesson as lesson %}
-                  {% if not lesson.start_datetime %}
+                  {% if not lesson.start_datetime and lesson %}
                   <a href="{% url 'lesson_start' lesson.pk %}" class="btn btn-primary">
                      {{ request|string:'start' }}
                   </a>  
-                  {% elif not lesson.end_datetime %}
+                  {% elif not lesson.end_datetime and lesson %}
                   <a href="{% url 'lesson_end' lesson.pk %}" class="btn btn-primary">
                      {{ request|string:'end' }}
                   </a>
